@@ -17,6 +17,18 @@ qual o faturamento total da empresa.
 *******************************************************************************/
 #include <stdio.h>
 
+int validarData ( Data dt );
+int validarData ( Data dt ){
+    if (dt.dia>=1 && dt.dia<=30) {
+        if (dt.mes>=1 && dt.mes<=12) {
+            if (dt.ano>=1900 && dt.ano<=2026) {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
 int main()
 {
     printf("Hello World");
