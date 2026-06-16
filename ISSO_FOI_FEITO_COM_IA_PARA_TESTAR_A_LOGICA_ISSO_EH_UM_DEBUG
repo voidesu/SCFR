@@ -1,0 +1,240 @@
+/******************************************************************************
+
+Uma pequena empresa realiza vendas de produtos e serviços para diversos clientes. 
+Atualmente, o controle financeiro é realizado manualmente, dificultando o acompanhamento 
+dos recebimentos, das vendas parceladas e da situação financeira da empresa. Para 
+melhorar esse processo, será desenvolvido um sistema de controle financeiro em 
+Linguagem C (ANSI C). O sistema deverá permitir o cadastro de clientes, o registro 
+de vendas, o acompanhamento das parcelas a receber e a geração de informações 
+gerenciais para auxiliar na tomada de decisão.
+
+O principal objetivo é controlar o fluxo de entrada de dinheiro na empresa, 
+independentemente da forma de pagamento utilizada. A empresa realiza vendas somente 
+para clientes cadastrados. Cada venda deverá possuir um valor total e uma forma de pagamento. 
+Dependendo da forma de pagamento escolhida, o comportamento do sistema deverá variar:
+
+Dinheiro (recebido imediatamente)
+Pix (recebido imediatamente)
+Cartão à Vista (recebido imediatamente, com taxa)
+Cartão Parcelado (recebido dividido em parcelas mensais, com taxa)
+
+O sistema deverá permitir que a empresa acompanhe:
+- quanto já recebeu;
+- quanto ainda tem a receber;
+- quais parcelas estão vencidas;
+- quais clientes possuem débitos pendentes;
+- qual o faturamento total da empresa.
+
+*******************************************************************************/
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_CLIENTES 10
+#define MAX_PARCELAS 24
+
+// Variáveis Globais
+int i = 0, j = 0, soma = 0;
+
+// Estruturas de Dados
+typedef struct {
+    int dia;
+    int mes;
+    int ano;
+} Data;
+    
+typedef struct {
+    char CPF[20];
+    char nome[50];
+    char telefone[15];
+    Data dataNascimento;
+    char numeroCartao[20];
+    char chavePix[30];
+} Cliente;
+
+typedef struct {
+    int idParcela;
+    int idVenda;
+    int numeroDaParcela;
+    float valorDaParcela;
+    Data dataVencimento;
+    Data dataRecebimento;
+    char situacaoDaParcela; 
+} Parcela;
+
+// Protótipos das Funções
+int validarCPF(Cliente c);
+int CalcularParcela();
+void exibirParcela(Parcela p);
+int validarData(Data dt);
+
+int main() 
+{
+    int opcao = 0;
+    Cliente c;
+    Data dataTeste;
+    Parcela parcelaTeste;
+
+    // Inicializando a parcela fictícia para o teste de exibição
+    parcelaTeste.idParcela = 101;
+    parcelaTeste.idVenda = 5002;
+    parcelaTeste.numeroDaParcela = 1;
+    parcelaTeste.valorDaParcela = 150.75;
+    parcelaTeste.dataVencimento.dia = 10;
+    parcelaTeste.dataVencimento.mes = 7;
+    parcelaTeste.dataVencimento.ano = 2026;
+    parcelaTeste.dataRecebimento.dia = 0; 
+    parcelaTeste.dataRecebimento.mes = 0;
+    parcelaTeste.dataRecebimento.ano = 0;
+    parcelaTeste.situacaoDaParcela = 'P';
+
+    do {
+        printf("\n=================================\n");
+        printf("   SISTEMA FINANCEIRO - MENU     \n");
+        printf("=================================\n");
+        printf("1 - Testar Validacao de CPF\n");
+        printf("2 - Testar Calculo de Parcela\n");
+        printf("3 - Testar Exibicao de Parcela\n");
+        printf("4 - Testar Validacao de Data\n");
+        printf("0 - Sair do Programa\n");
+        printf("=================================\n");
+        printf("Escolha uma opcao: ");
+        scanf("%d", &opcao);
+        
+        // Limpa o buffer após ler a opção do menu
+        while (getchar() != '\n');
+        printf("\n");
+
+        switch (opcao) {
+            case 1:
+                printf("--- TESTE: VALIDACAO DE CPF ---\n");
+                printf("Digite o CPF (com ou sem pontos/hífen): ");
+                fgets(c.CPF, sizeof(c.CPF), stdin);
+                c.CPF[strcspn(c.CPF, "\n")] = '\0'; // Remove o \n do final
+                validarCPF(c);
+                break;
+
+            case 2:
+                printf("--- TESTE: CALCULO DE PARCELAS ---\n");
+                CalcularParcela();
+                break;
+
+            case 3:
+                printf("--- TESTE: EXIBICAO DE PARCELA (Dados Ficticios) ---\n");
+                exibirParcela(parcelaTeste);
+                break;
+
+            case 4:
+                printf("--- TESTE: VALIDACAO DE DATA ---\n");
+                printf("Digite uma data (DD MM AAAA): ");
+                scanf("%d %d %d", &dataTeste.dia, &dataTeste.mes, &dataTeste.ano);
+                
+                if (validarData(dataTeste)) {
+                    printf("Resultado: Data Valida!\n");
+                } else {
+                    printf("Resultado: Data Invalida!\n");
+                }
+                break;
+
+            case 0:
+                printf("Saindo do programa de testes... Ate logo!\n");
+                break;
+
+            default:
+                printf("Opcao invalida! Tente novamente.\n");
+                break;
+        }
+
+    } while (opcao != 0);
+
+    return 0;
+}
+
+// Implementação: Validação de Data
+int validarData(Data dt) {
+    if (dt.dia >= 1 && dt.dia <= 30) {
+        if (dt.mes >= 1 && dt.mes <= 12) {
+            if (dt.ano >= 1900 && dt.ano <= 2026) {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+// Implementação: Validação de CPF
+int validarCPF(Cliente c) {
+    j = 10;
+    soma = 0;
+    int resto = 0, primeiroDigito = 0, segundoDigito = 0;
+        
+    for(i = 0; i < 20; i++) {
+        if(c.CPF[i] == '\0') break;
+        if(c.CPF[i] == '.' || c.CPF[i] == '-') continue;
+            
+        soma += (c.CPF[i] - '0') * j;
+        j--;
+        if(j < 2) break;
+    }
+    
+    resto = (soma * 10) % 11;
+    primeiroDigito = (resto > 10) ? 0 : resto;
+    
+    j = 11;
+    soma = 0;
+    
+    for(i = 0; i < 20; i++) {
+        if(c.CPF[i] == '\0') break;
+        if(c.CPF[i] == '.' || c.CPF[i] == '-') continue;
+            
+        soma += (c.CPF[i] - '0') * j;
+        j--;
+        if(j < 2) break;
+    }
+    
+    resto = (soma * 10) % 11;
+    segundoDigito = (resto > 10) ? 0 : resto;
+    
+    int tam = strlen(c.CPF);
+    if ((c.CPF[tam - 1] - '0' == segundoDigito) && (c.CPF[tam - 2] - '0' == primeiroDigito)) {
+        printf("Resultado: CPF Validado!\n");
+        return 0;
+    } else {
+        printf("Resultado: CPF Invalido!\n");
+        return 1;
+    }
+}
+
+// Implementação: Calcular Parcela
+int CalcularParcela() {
+    float valorTotal = 0;
+    int qtdParcelas = 0;
+    Parcela p;
+    
+    printf("Qual seria o valor total da venda? R$ ");
+    scanf("%f", &valorTotal);
+    printf("Quantas parcelas? ");
+    scanf("%d", &qtdParcelas);
+    
+    if (qtdParcelas <= 0) {
+        printf("Quantidade de parcelas invalida!\n");
+        return 1;
+    }
+    
+    p.numeroDaParcela = qtdParcelas;
+    p.valorDaParcela = valorTotal / qtdParcelas;
+    
+    printf("Valor de cada parcela (%d vezes): R$ %.2f\n", p.numeroDaParcela, p.valorDaParcela);
+    return 0;
+}
+
+// Implementação: Exibir Parcela
+void exibirParcela(Parcela p) {
+    printf("        Dados da Parcela   \n");
+    printf("ID da Parcela      ->  %10d\n", p.idParcela);
+    printf("ID da Venda        ->  %10d\n", p.idVenda);
+    printf("Numero da Parcela  ->  %10d\n", p.numeroDaParcela);
+    printf("Valor da Parcela   ->  R$ %7.2f\n", p.valorDaParcela);
+    printf("Data de Vencimento ->  %02d/%02d/%d\n", p.dataVencimento.dia, p.dataVencimento.mes, p.dataVencimento.ano);
+    printf("Data de Recebimento -> %02d/%02d/%d\n", p.dataRecebimento.dia, p.dataRecebimento.mes, p.dataRecebimento.ano);
+    printf("\nSituacao da Parcela: %c\n", p.situacaoDaParcela);
+}
