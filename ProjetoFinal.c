@@ -51,8 +51,10 @@ typedef struct{
 	char situacaoDaParcela;
 } Parcela;
 
+
+
 int validarCPF(Cliente CPF);
-int CalcularParcela();
+float CalcularParcela();
 void exibirParcela(Parcela p);
 
 int main()
@@ -64,11 +66,16 @@ int main()
 	printf("-------------------------------------------------------------\n");
 	printf("Escolha uma das opcoes abaixo:\n");
 	printf("-------------------------------------------------------------\n");
-	printf("1 - Cadastrar produto\n");
-	printf("2 - Realizar compra\n");
-	printf("3 - Realizar venda\n");
-	printf("4 - Consultar estoque\n");
-	printf("5 - Sair\n");
+	printf("1 - Cadastrar Cliente\n");
+	printf("2 - Registrar Venda\n");
+	printf("3 - Consultar Clientes\n");
+	printf("4 - Consultar Parcelas\n");
+	printf("5 - Parcelas Vencidas\n");
+	printf("6 - Clientes Inadimplentes\n");
+	printf("7 - Faturamento Total\n");
+	printf("8 - Valor a Receber\n");
+	printf("9 - Valor Recebido\n");
+	printf("0 - Sair\n");
 	printf("-------------------------------------------------------------\n");
 	printf("Opcao: ");
 	scanf("%d",&menu);
@@ -151,24 +158,27 @@ int validarCPF(Cliente c){
 		printf("CPF Invalido!");
 		return 1;
 	}
-	
-	int CalcularParcela() {
-		Parcela p;
-		
-		float ValorMes = 0;
-		printf("Qual seria o valor total?");
-		scanf("%f", &p.valorDaParcela);
-		printf("Quantas parcelas?");
-		scanf("%d", &p.numeroDaParcela);
-		
-		ValorMes = p.valorDaParcela / p.numeroDaParcela;
-		printf("%.2f", ValorMes);
-	
-	
-	
-}	
 
-void exibirParcela(Parcela p) {
+	
+	float CalcularParcela(){
+    Parcela p;
+    float valorMes;
+
+    printf("Qual seria o valor total? ");
+    scanf("%f", &p.valorDaParcela);
+
+    printf("Quantas parcelas? ");
+    scanf("%d", &p.numeroDaParcela);
+
+    valorMes = p.valorDaParcela / p.numeroDaParcela;
+
+    printf("\nValor de cada parcela: R$ %.2f\n", valorMes);
+
+    return valorMes;
+	}
+	
+	
+	void exibirParcela(Parcela p) {
 	printf("        Dados da Parcela   \n");
 	printf("ID da Parcela      ->  %10d\n", p.idParcela);
 	printf("ID da Venda        ->  %10d\n", p.idVenda);
@@ -177,5 +187,10 @@ void exibirParcela(Parcela p) {
 	printf("Data de Vencimento ->  %02d/%02d/%d\n", p.dataVencimento.dia ,p.dataVencimento.mes, p.dataVencimento.ano);
 	printf("Data de Recebimento -> %02d/%02d/%d\n", p.dataRecebimento.dia ,p.dataRecebimento.mes, p.dataRecebimento.ano);
 	printf("\nSituacao da Parcela: %c\n", p.situacaoDaParcela);
-	}
 }
+}
+	
+	
+	  
+
+
