@@ -53,9 +53,112 @@ int i = 0, j = 0, soma = 0;
 Cliente cliente[50];
 int qtdClientes = 0;
     
-// Funções de Validação do Cadastro de Clientes
+// PROTOTIPO DAS FUNCOES    
+    
+	// Funções de Validação do Cadastro de Clientes
 
 int validarData ( Data dt );
+int validarTelefone ( Cliente c );
+int validarEmail ( Cliente c );
+int validarCartao ( Cliente c );
+int validarCPF(Cliente c);
+
+
+	// Funções de Clientes
+
+void cadastrarCliente(Cliente *c);
+
+
+void exibirCliente(Cliente c);
+
+
+	// BUSCA DE CLIENTES
+
+void buscarPorNome ();
+
+
+void buscarPorCPF ();
+
+
+void buscarPorTelefone ();
+
+
+void menuBuscarCliente ();
+
+
+	// Funções de Registro de Venda e Parcelas
+
+int registroVenda();
+int registroVenda() {
+    return 0;
+}
+
+int CalcularParcela();
+
+
+void exibirParcela(Parcela p);
+  
+
+// Encontrou o main!
+int main(){
+    int menu = 0;
+
+    do {
+        printf("\n=============================================================\n");
+        printf("                     PAINEL DE COMPRA E VENDAS\n");
+        printf("=============================================================\n");
+        printf("Desenvolvido por Amanda e Giovanni\n");
+        printf("-------------------------------------------------------------\n");
+        printf("Escolha uma das opcoes abaixo:\n");
+        printf("-------------------------------------------------------------\n");
+        printf("1 - Cadastrar Cliente\n");
+        printf("2 - Registrar Venda\n");
+        printf("3 - Consultar Clientes\n");
+        printf("4 - Consultar Parcelas\n");
+        printf("5 - Parcelas Vencidas\n");
+        printf("6 - Clientes Inadimplentes\n");
+        printf("7 - Faturamento Total\n");
+        printf("8 - Valor a Receber\n");
+        printf("9 - Valor Recebido\n");
+        printf("0 - Sair\n");
+        printf("-------------------------------------------------------------\n");
+        printf("Opcao: ");
+        scanf("%d", &menu);
+        getchar();
+        
+        switch(menu) {
+            case 1:
+                if (qtdClientes < 50) {
+                    cadastrarCliente(&cliente[qtdClientes]);
+                    qtdClientes++;
+                } else {
+                    printf("\nLimite de clientes atingido!\n");
+                }
+                break;
+                
+            case 2:
+                break;
+                
+            case 3:
+                menuBuscarCliente();
+                break;
+                
+            case 4:
+                break;
+                
+            case 0:
+                printf("\nSaindo do sistema...\n");
+                break;
+                
+            default:
+                printf("\nOpcao Invalida!\n");
+                break;
+        }
+    } while (menu != 0);
+
+    return 0;
+}
+
 int validarData ( Data dt ){
     if (dt.dia>=1 && dt.dia<=30) {
         if (dt.mes>=1 && dt.mes<=12) {
@@ -67,7 +170,6 @@ int validarData ( Data dt ){
     return 0;
 }
 
-int validarTelefone ( Cliente c );
 int validarTelefone ( Cliente c ){
     int tamanho = strlen(c.telefone);
     if (c.telefone[0] == '0' ) { 
@@ -78,7 +180,6 @@ int validarTelefone ( Cliente c ){
     return 0;
 }
 
-int validarEmail ( Cliente c );
 int validarEmail ( Cliente c) {
     int arroba = 0;
     int posArroba = -1;
@@ -118,7 +219,6 @@ int validarEmail ( Cliente c) {
     return 1;
 }
 
-int validarCartao ( Cliente c );
 int validarCartao ( Cliente c ){
     int tamanho = strlen(c.numeroCartao);
     int numero = 0;
@@ -153,7 +253,6 @@ int validarCartao ( Cliente c ){
     }
 }
 
-int validarCPF(Cliente c);
 int validarCPF(Cliente c){
     int jLocal = 10;
     int somaLocal = 0;
@@ -221,9 +320,6 @@ int validarCPF(Cliente c){
     }
 }
 
-// Funções de Clientes
-
-void cadastrarCliente(Cliente *c);
 void cadastrarCliente(Cliente *c) {
 
     printf("\nNome..: ");
@@ -283,7 +379,6 @@ void cadastrarCliente(Cliente *c) {
     printf("\n Cadastro Completo!!\n");
 }
 
-void exibirCliente(Cliente c);
 void exibirCliente(Cliente c) {
     printf("\nNome: %s", c.nome);
     printf("\nCPF: %s", c.CPF);
@@ -293,9 +388,6 @@ void exibirCliente(Cliente c) {
     printf("\nChave Pix: %s", c.chavePix);
 }
 
-// BUSCA DE CLIENTES
-
-void buscarPorNome ();
 void buscarPorNome () {
     char nome[50];
     i = 0;
@@ -314,7 +406,6 @@ void buscarPorNome () {
     printf("\nCliente nao encontrado!\n");
 }
 
-void buscarPorCPF ();
 void buscarPorCPF () {
     char CPF[50];
     i = 0;
@@ -333,7 +424,6 @@ void buscarPorCPF () {
     printf("\nCliente nao encontrado!\n");
 }
 
-void buscarPorTelefone ();
 void buscarPorTelefone () {
     char telefone[15];
     i = 0;
@@ -352,7 +442,6 @@ void buscarPorTelefone () {
     printf("\nCliente nao encontrado!\n");
 }
 
-void menuBuscarCliente ();
 void menuBuscarCliente () {
     int menu = 0;
     
@@ -384,14 +473,6 @@ void menuBuscarCliente () {
     }
 }
 
-// Funções de Registro de Venda e Parcelas
-
-int registroVenda();
-int registroVenda() {
-    return 0;
-}
-
-int CalcularParcela();
 int CalcularParcela() {
     Parcela p;
     float ValorMes = 0;
@@ -408,7 +489,6 @@ int CalcularParcela() {
     return 0;
 }
 
-void exibirParcela(Parcela p);
 void exibirParcela(Parcela p) {
     printf("        Dados da Parcela   \n");
     printf("ID da Parcela      ->  %10d\n", p.idParcela);
@@ -418,64 +498,4 @@ void exibirParcela(Parcela p) {
     printf("Data de Vencimento ->  %02d/%02d/%d\n", p.dataVencimento.dia ,p.dataVencimento.mes, p.dataVencimento.ano);
     printf("Data de Recebimento -> %02d/%02d/%d\n", p.dataRecebimento.dia ,p.dataRecebimento.mes, p.dataRecebimento.ano);
     printf("\nSituacao da Parcela: %c\n", p.situacaoDaParcela);
-}   
-
-// Encontrou o main! ??
-int main(){
-    int menu = 0;
-
-    do {
-        printf("\n=============================================================\n");
-        printf("                     PAINEL DE COMPRA E VENDAS\n");
-        printf("=============================================================\n");
-        printf("Desenvolvido por Amanda e Giovanni\n");
-        printf("-------------------------------------------------------------\n");
-        printf("Escolha uma das opcoes abaixo:\n");
-        printf("-------------------------------------------------------------\n");
-        printf("1 - Cadastrar Cliente\n");
-        printf("2 - Registrar Venda\n");
-        printf("3 - Consultar Clientes\n");
-        printf("4 - Consultar Parcelas\n");
-        printf("5 - Parcelas Vencidas\n");
-        printf("6 - Clientes Inadimplentes\n");
-        printf("7 - Faturamento Total\n");
-        printf("8 - Valor a Receber\n");
-        printf("9 - Valor Recebido\n");
-        printf("0 - Sair\n");
-        printf("-------------------------------------------------------------\n");
-        printf("Opcao: ");
-        scanf("%d", &menu);
-        getchar();
-        
-        switch(menu) {
-            case 1:
-                if (qtdClientes < 50) {
-                    cadastrarCliente(&cliente[qtdClientes]);
-                    qtdClientes++;
-                } else {
-                    printf("\nLimite de clientes atingido!\n");
-                }
-                break;
-                
-            case 2:
-                break;
-                
-            case 3:
-                menuBuscarCliente();
-                break;
-                
-            case 4:
-                break;
-                
-            case 0:
-                printf("\nSaindo do sistema...\n");
-                break;
-                
-            default:
-                printf("\nOpcao Invalida!\n");
-                break;
-        }
-    } while (menu != 0);
-
-    return 0;
-}
+} 
