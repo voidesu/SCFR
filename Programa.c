@@ -159,21 +159,25 @@ int validarData ( Data dt ){
     return 0;
 }
 
-int validarTelefone (char telefone[]){
+int validarTelefone (char telefone[]) {
     int tamanho = strlen(telefone);
-    if (telefone[0] == '0' ) { 
-        if (tamanho == 11 || tamanho == 12) {
-            return 1;
-        }
+    int i = 0;
+    
+    if (telefone[0] != '0' ) { 
+        return 0;
     }
-    for(i = 0; i < tamanho - 1 ; i++){
+    
+    if (tamanho != 11 && tamanho != 12) {
+        return 0;
+    }
+        
+    for(i = 0; i < tamanho; i++){
 		if(telefone[i] < '0' || telefone[i] > '9'){
 			return 0;
 		}
 	}
-    return 0;
+    return 1;
 }
-
 int validarEmail (char email[]) {
     int arroba = 0;
     int posArroba = -1;
