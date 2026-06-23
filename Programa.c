@@ -388,7 +388,7 @@ void exibirCliente(Cliente c) {
     printf("\nChave Pix: %s", c.chavePix);
 }
 
-void buscarPorNome () {
+int buscarPorNome () {
     char nome[50];
     i = 0;
     
@@ -399,14 +399,15 @@ void buscarPorNome () {
     for (i = 0; i < qtdClientes; i++) {
         if (strcmp(cliente[i].nome, nome) == 0) {
             exibirCliente(cliente[i]);
-            return;
+            return 1;
         }
     }
     
     printf("\nCliente nao encontrado!\n");
+    return 0;
 }
 
-void buscarPorCPF () {
+int buscarPorCPF () {
     char CPF[50];
     i = 0;
     
@@ -417,29 +418,31 @@ void buscarPorCPF () {
     for ( i = 0; i < qtdClientes; i++) {
         if (strcmp(cliente[i].CPF, CPF) == 0) {
             exibirCliente(cliente[i]);
-            return;
+            return 1;
         }
     }
     
     printf("\nCliente nao encontrado!\n");
+    return 0;
 }
 
-void buscarPorTelefone () {
+int buscarPorTelefone () {
     char telefone[15];
     i = 0;
     
     printf("Digite o telefone..: ");
     fgets(telefone, 15, stdin);
-    telefone[strcspn(telefone, "\n")] = '\0'; // Corrigido operador de comparação de string para atribuição
+    telefone[strcspn(telefone, "\n")] = '\0';
     
     for (i = 0; i < qtdClientes; i++) {
         if (strcmp(cliente[i].telefone, telefone) == 0) {
             exibirCliente(cliente[i]);
-            return;
+            return 1;
         }
     }
     
     printf("\nCliente nao encontrado!\n");
+    return 0;
 }
 
 void menuBuscarCliente () {
