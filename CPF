@@ -25,13 +25,13 @@ int i = 0,
 	j = 0,
 	soma = 0;
 
-typedef struct{
+typedef struct {
 		int dia;
 		int mes;
 		int ano;
 	} Data;
 	
-typedef struct{
+typedef struct {
 		char CPF[20];
 		char nome[50];
 		char telefone[15];
@@ -39,6 +39,26 @@ typedef struct{
 		char numeroCartao[20];
 		char chavePix[30];
 	} Cliente;
+
+typedef struct {
+    Cliente cliente[50];
+	int idVenda;
+    float valorTotalVenda;
+    int formaPagamento;
+    int qtdeParcelas;
+    Data dataVenda;
+    char observacao[50];
+} Vendas;
+
+typedef struct {
+    int idParcela;
+    int idVenda;
+    int numeroDaParcela;
+    float valorDaParcela;
+    Data dataVencimento;
+    Data dataRecebimento;
+    char situacaoDaParcela;
+} Parcela;
 
 int validarCPF(Cliente CPF);
 
