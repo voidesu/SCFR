@@ -48,15 +48,13 @@ typedef struct Parcela {
 } Parcela;
 
 // VARIAVEIS GLOBAIS
-
-int i = 0, j = 0, soma = 0; 
     
-Cliente cliente[50];
+Cliente cliente[20];
 int qtdClientes = 0;
-
 
 Vendas vetorVendas[100];
 int qtdVendas = 0;
+
 Parcela vetorParcelas[1000];
 int qtdParcelas = 0;
     
@@ -73,21 +71,56 @@ int validarCPF(char cpf[]);
 void cadastrarCliente();
 void exibirCliente(Cliente c);
 
-// BUSCA DE CLIENTES
+// BUSCAR CLIENTES
 void buscarPorNome ();
 void buscarPorCPF ();
 void buscarPorTelefone ();
 void menuBuscarCliente ();
 
+// BUSCAR VENDAS
+void buscarVendaNome ();
+void buscarVendaCPF ();
+void buscarVendaTelefone ();
+void buscarVendaID ();
+
 // Funções de Registro de Venda e Parcelas
-//int registroVenda(); 
+void registroVenda(); // feito
+void consultarVendas(); 
 int CalcularParcela();
 void exibirParcela(Parcela p);
-void gerarParcelas(Vendas v);
-  
-
+void gerarParcelas(Vendas v); //feito
+void exibirVenda(Vendas v);
+void exibirParcelasVenda(int idVenda);
+    
+ 
+// O MAIN TA AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
 int main(){
     int menu = 0;
+
+
+    // Clientes Fixos para Teste
+    strcpy(cliente[0].nome, "Amanda Correa");
+    strcpy(cliente[0].CPF, "12135016950");
+    strcpy(cliente[0].telefone, "043991231517");
+    cliente[0].dataNascimento.dia = 21;
+    cliente[0].dataNascimento.mes = 10;
+    cliente[0].dataNascimento.ano = 2007;
+    strcpy(cliente[0].numeroCartao, "4532015112830366");
+    strcpy(cliente[0].chavePix, "amanda@email.com");
+
+    qtdClientes ++;
+
+    strcpy(cliente[1].nome, "Giovanni Marin");
+    strcpy(cliente[1].CPF, "52998224725");
+    strcpy(cliente[1].telefone, "044991521235");
+    cliente[1].dataNascimento.dia = 22;
+    cliente[1].dataNascimento.mes = 11;
+    cliente[1].dataNascimento.ano = 2008;
+    strcpy(cliente[1].numeroCartao, "4556737586899855");
+    strcpy(cliente[1].chavePix, "giovanni@email.com");
+
+    qtdClientes ++;
+
 
     do {
         printf("\n=============================================================\n");
@@ -97,16 +130,17 @@ int main(){
         printf("-------------------------------------------------------------\n");
         printf("Escolha uma das opcoes abaixo:\n");
         printf("-------------------------------------------------------------\n");
-        printf("1 - Cadastrar Cliente\n");
-        printf("2 - Registrar Venda\n");
-        printf("3 - Consultar Clientes\n");
-        printf("4 - Consultar Parcelas\n");
-        printf("5 - Parcelas Vencidas\n");
-        printf("6 - Clientes Inadimplentes\n");
-        printf("7 - Faturamento Total\n");
-        printf("8 - Valor a Receber\n");
-        printf("9 - Valor Recebido\n");
-        printf("0 - Sair\n");
+        printf(" 1 - Cadastrar Cliente\n");
+        printf(" 2 - Registrar Venda\n");
+        printf(" 3 - Consultar Clientes\n");
+        printf(" 4 - Consultar Vendas\n");
+        printf(" 5 - Consultar Parcelas\n");
+        printf(" 6 - Parcelas Vencidas\n");
+        printf(" 7 - Clientes Inadimplentes\n");
+        printf(" 8 - Faturamento Total\n");
+        printf(" 9 - Valor a Receber\n");
+        printf("10 - Valor Recebido\n");
+        printf(" 0 - Sair\n");
         printf("-------------------------------------------------------------\n");
         printf("Opcao: ");
         scanf("%d", &menu);
@@ -121,7 +155,7 @@ int main(){
                 }
                 break;
             case 2:
-            	//registroVenda();
+            	registroVenda();
                 break;
                 
             case 3:
@@ -129,6 +163,7 @@ int main(){
                 break;
                 
             case 4:
+                consultarVendas();
                 break;
                 
             case 0:
@@ -144,33 +179,38 @@ int main(){
     return 0;
 }
 
+
+//FUNÇÕES DE VALIDAÇÃO
 int validarData ( Data dt ){
     int diasMes[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     if ((dt.ano % 4 == 0 && dt.ano % 100 != 0) || (dt.ano % 400 == 0)){
 		diasMes[2] = 29;
 	}
-    if (dt.dia >= 1 && dt.dia <= diasMes[dt.mes]){
-        if (dt.mes>=1 && dt.mes<=12) {
+
+    if (dt.mes >= 1 && dt.mes <= 12) {
+        if (dt.dia >= 1 && dt.dia <= diasMes[dt.mes]) {
             if (dt.ano >= 1900) {
                 return 1;
             }
         }
     }
+
     return 0;
 }
 
 int validarTelefone (char telefone[]){
     int tamanho = strlen(telefone);
-    if (telefone[0] == '0' ) { 
+    int i;
+    if (telefone[0] == '0') {
         if (tamanho == 11 || tamanho == 12) {
+            for(i = 0; i < tamanho; i++){
+                if(telefone[i] < '0' || telefone[i] > '9'){
+                    return 0;
+                }
+            }
             return 1;
         }
     }
-    for(i = 0; i < tamanho - 1 ; i++){
-		if(telefone[i] < '0' || telefone[i] > '9'){
-			return 0;
-		}
-	}
     return 0;
 }
 
@@ -178,6 +218,7 @@ int validarEmail (char email[]) {
     int arroba = 0;
     int posArroba = -1;
     int posPonto = -1;
+    int i;
     
     for ( i = 0; i < strlen(email); i++) {
         if( email[i] == '@' ) {
@@ -204,6 +245,7 @@ int validarCartao (char cartao[]){
     int numero = 0;
     int somaLocal = 0; 
     int dobrar = 0;
+    int i;
     
     for(i = tamanho - 1; i>=0; i--){
         numero = cartao[i] - '0';
@@ -294,6 +336,7 @@ int validarCPF(char cpf[]) {
     }
 }
 
+// funçoes de clientes
 void cadastrarCliente() {
     // REGISTRA O NOME
     printf("\nNome..: ");
@@ -346,7 +389,7 @@ void cadastrarCliente() {
     fgets(cliente[qtdClientes].chavePix, 30, stdin);
     cliente[qtdClientes].chavePix[strcspn(cliente[qtdClientes].chavePix, "\n")] = '\0';
 	//LOOPA A FUNCAO DE VALIDAR PIX, NAO EH POSSIVEL CRIAR UM PIX INVALIDO
-    while (validarCartao(cliente[qtdClientes].numeroCartao) == 0){
+    while (validarEmail(cliente[qtdClientes].chavePix) == 0){
         printf("CHAVE PIX INVALIDA! Tente novamente..: ");
         fgets(cliente[qtdClientes].chavePix, 30, stdin);
         cliente[qtdClientes].chavePix[strcspn(cliente[qtdClientes].chavePix, "\n")] = '\0';
@@ -366,7 +409,9 @@ void exibirCliente(Cliente c) {
     printf("\nChave Pix: %s", c.chavePix);
 }
 
+// busca de clientes
 void buscarPorNome () {
+    int i;
     char nome[50];
     printf("Digite o nome..: ");
     fgets(nome, 50, stdin);
@@ -382,6 +427,7 @@ void buscarPorNome () {
 }
 
 void buscarPorCPF () {
+    int i;
     char CPF[50];
     printf("Digite o CPF..: ");
     fgets(CPF, 50, stdin);
@@ -397,6 +443,7 @@ void buscarPorCPF () {
 }
 
 void buscarPorTelefone () {
+    int i;
     char telefone[15];
     printf("Digite o telefone..: ");
     fgets(telefone, 15, stdin);
@@ -434,35 +481,323 @@ void menuBuscarCliente () {
     }
 }
 
-void gerarParcelas(Vendas v){
-    float valor;
-    for(i=1;i<=v.qtdeParcelas;i++){
-        Parcela p;
-        p.idParcela=qtdParcelas+1001;
-        p.idVenda=v.idVenda;
-        p.numeroDaParcela=i;
-        
-        // JUROS
-        valor=(v.valorTotalVenda/v.qtdeParcelas);
-        valor = valor * pow(1.01,i);
-        // CRIACAO
-        p.valorDaParcela=valor;
-        p.dataVencimento=v.dataVenda;
-        p.dataVencimento.mes += i;
-        // + 12 meses = Passa para o proximo ano
-        if(p.dataVencimento.mes>12){
-            p.dataVencimento.mes-=12;
-            p.dataVencimento.ano++;
+// buscas pra Vendas
+void buscarVendaNome () {
+    char nome[50];
+    int i;
+    int quantidade = 0;
+    
+    printf("Nome: ");
+    fgets(nome, 50, stdin);
+    nome[strcspn(nome,"\n")] = '\0';
+    
+    for(i = 0; i<qtdVendas; i++){
+        if(strcmp(vetorVendas[i].cliente.nome, nome) == 0) {
+            exibirVenda(vetorVendas[i]);
+            quantidade++;
         }
-        
-        p.dataRecebimento.dia=0;
-        p.dataRecebimento.mes=0;
-        p.dataRecebimento.ano=0;
-        
-        p.situacaoDaParcela='A';
-        
-		vetorParcelas[qtdParcelas] = p;
-        
-		qtdParcelas++;
+    }
+    
+    if (quantidade == 0) {
+        printf("\n Nenhuma venda encontrada!");
     }
 }
+void buscarVendaCPF () {
+    char CPF[50];
+    int i;
+    int quantidade = 0;
+    
+    printf("CPF: ");
+    fgets(CPF, 50, stdin);
+    CPF[strcspn(CPF,"\n")] = '\0';
+    
+    for(i = 0; i<qtdVendas; i++){
+        if(strcmp(vetorVendas[i].cliente.CPF, CPF) == 0) {
+            exibirVenda(vetorVendas[i]);
+            quantidade++;
+        }
+    }
+    
+    if (quantidade == 0) {
+        printf("\n Nenhuma venda encontrada!");
+    }
+}
+void buscarVendaTelefone () {
+    char telefone[15];
+    int i;
+    int quantidade = 0;
+
+    printf("Telefone: ");
+    fgets(telefone,15,stdin);
+    telefone[strcspn(telefone,"\n")] = '\0';
+
+    for(i = 0; i < qtdVendas; i++){
+
+        if(strcmp(vetorVendas[i].cliente.telefone, telefone) == 0){
+
+            exibirVenda(vetorVendas[i]);
+            quantidade++;
+        }
+    }
+
+    if(quantidade == 0){
+        printf("\n Nenhuma venda encontrada!");
+    }
+}
+void buscarVendaID (){
+    int id;
+    int i;
+
+    printf("Digite o ID da venda: ");
+    scanf("%d", &id);
+    getchar();
+
+    for (i = 0; i < qtdVendas; i++) {
+        if (vetorVendas[i].idVenda == id) {
+            exibirVenda(vetorVendas[i]);
+            return;
+        }
+    }
+    printf("\n Venda nao encontrada!");
+}
+
+// funções de  Parcelas e Vendas
+void gerarParcelas(Vendas v){
+
+    float valor;
+    int i;
+
+    int limite = v.qtdeParcelas;
+
+    if(limite > 10 || limite < 1){
+        limite = 10;
+    }
+
+
+    for(i = 1; i <= limite; i++){
+
+        Parcela p;
+
+        p.idParcela = qtdParcelas + 1001;
+        p.idVenda = v.idVenda;
+        p.numeroDaParcela = i;
+
+
+        valor = v.valorTotalVenda / limite;
+        valor = valor * pow(1.01, i);
+
+        p.valorDaParcela = valor;
+
+
+        p.dataVencimento = v.dataVenda;
+
+        p.dataVencimento.dia += (30 * i);
+
+
+    while(p.dataVencimento.dia > 30){
+
+        p.dataVencimento.dia -= 30;
+        p.dataVencimento.mes++;
+
+    if(p.dataVencimento.mes > 12){
+        p.dataVencimento.mes = 1;
+        p.dataVencimento.ano++;
+    }
+}
+
+
+        p.dataRecebimento.dia = 0;
+        p.dataRecebimento.mes = 0;
+        p.dataRecebimento.ano = 0;
+
+
+        p.situacaoDaParcela = 'A';
+
+
+        vetorParcelas[qtdParcelas] = p;
+        qtdParcelas++;
+    }
+}
+
+void registroVenda() {
+    int idCliente, formaPgto, i;
+
+    if (qtdClientes == 0) {
+        printf("\nERRO -> NAO EXISTE NENHUM CLIENTE\n");
+        return;
+    }
+
+    // MOSTRA LISTA DE CLIENTES
+    printf("\n--- CLIENTES CADASTRADOS ---\n");
+    for (i = 0; i < qtdClientes; i++) {
+        printf("%d - %s (CPF: %s)\n", i, cliente[i].nome, cliente[i].CPF);
+    }
+
+    // ESCOLHE O CLIENTE
+    printf("\nEscolha o cliente (indice): ");
+    scanf("%d", &idCliente);
+    getchar();
+
+    if (idCliente < 0 || idCliente >= qtdClientes) {
+        printf("\nCliente invalido!\n");
+        return;
+    }
+
+    // DADOS DA VENDA
+    Vendas v;
+    v.idVenda = qtdVendas + 1;
+    v.cliente = cliente[idCliente];
+
+    printf("Valor total da venda: R$ ");
+    scanf("%f", &v.valorTotalVenda);
+    getchar();
+
+    printf("Forma de Pagamento:\n");
+    printf("1 - Dinheiro\n2 - Pix\n3 - Cartao a Vista\n4 - Cartao Parcelado\n");
+    printf("Opcao: ");
+    scanf("%d", &formaPgto);
+    getchar();
+
+    v.formaPagamento = formaPgto;
+
+    printf("Data da Venda (dd/mm/aaaa): ");
+    scanf("%d/%d/%d", &v.dataVenda.dia, &v.dataVenda.mes, &v.dataVenda.ano);
+    getchar();
+
+    printf("Observacao: ");
+    fgets(v.observacao, 50, stdin);
+    v.observacao[strcspn(v.observacao, "\n")] = '\0';
+
+    if (formaPgto == 4) {
+        // CARTAO PARCELADO - pergunta quantidade de parcelas (max 10)
+        do {
+            printf("Quantidade de parcelas (1 a 10): ");
+            scanf("%d", &v.qtdeParcelas);
+            getchar();
+        } while (v.qtdeParcelas < 1 || v.qtdeParcelas > 10);
+
+        vetorVendas[qtdVendas] = v;
+        gerarParcelas(v);
+    } else {
+        // A VISTA - 1 parcela sem juros
+        v.qtdeParcelas = 1;
+
+        Parcela p;
+        p.idParcela = qtdParcelas + 1001;
+        p.idVenda = v.idVenda;
+        p.numeroDaParcela = 1;
+        p.valorDaParcela = v.valorTotalVenda;
+
+        if (formaPgto == 3) {
+            // CARTAO A VISTA - aplicar taxa (ex: 2% de taxa)
+            // Regra: Cartao a Vista tem taxa mas nao informaram o valor
+            // Se tiver taxa, aplicar aqui: p.valorDaParcela *= 1.02;
+        }
+
+        p.dataVencimento = v.dataVenda;
+        p.dataRecebimento.dia = 0;
+        p.dataRecebimento.mes = 0;
+        p.dataRecebimento.ano = 0;
+        p.situacaoDaParcela = 'A';
+
+        vetorVendas[qtdVendas] = v;
+        vetorParcelas[qtdParcelas] = p;
+        qtdParcelas++;
+    }
+
+    qtdVendas++;
+    printf("\nVenda registrada com sucesso! ID da venda: %d\n", v.idVenda);
+}
+
+void consultarVendas() { 
+    int opcao;
+    
+    printf("\n==================================\n");
+    printf("         CONSULTAR VENDAS\n");
+    printf("==================================\n");
+    printf("1 - Buscar por ID da venda\n");
+    printf("2 - Buscar por Nome do cliente\n");
+    printf("3 - Buscar por CPF do cliente\n");
+    printf("4 - Buscar por Telefone do cliente\n");
+    printf("Opcao: ");
+    scanf("%d", &opcao);
+    getchar();
+    
+    switch(opcao){
+        case 1:
+        buscarVendaID();
+        break;
+        
+        case 2:
+        buscarVendaNome ();
+        break;
+        
+        case 3:
+        buscarVendaCPF ();
+        break;
+        
+        case 4:
+        buscarVendaTelefone();
+        break;
+        
+        default:
+        printf("OPCAO INVALIDA!!\n");
+    }
+}
+
+void exibirVenda(Vendas v){
+
+    printf("\n==============================");
+    printf("\nID da venda: %d", v.idVenda);
+    printf("\nCliente: %s", v.cliente.nome);
+    printf("\nCPF: %s", v.cliente.CPF);
+    printf("\nValor: R$ %.2f", v.valorTotalVenda);
+    printf("\nForma de pagamento: ");
+    switch (v.formaPagamento) {
+    case 1:
+        printf("Dinheiro");
+        break;
+
+    case 2:
+        printf("Pix");
+        break;
+
+    case 3:
+        printf("Cartao a Vista");
+        break;
+
+    case 4:
+        printf("Cartao Parcelado");
+        break;
+}
+    printf("\nParcelas: %d", v.qtdeParcelas);
+    printf("\nData: %02d/%02d/%04d", v.dataVenda.dia, v.dataVenda.mes, v.dataVenda.ano);
+    printf("\nObservacao: %s\n", v.observacao);
+    
+    if (v.formaPagamento == 4) {
+    exibirParcelasVenda(v.idVenda);
+}
+}
+
+void exibirParcelasVenda(int idVenda){
+    int i;
+    
+    printf("\n==============================");
+    printf("\n         Parcelas\n");
+    printf("\n------------------------------");
+    
+    for(i=0;i<qtdParcelas;i++){
+        
+        if(vetorParcelas[i].idVenda == idVenda){
+
+            printf("\nParcela %d", vetorParcelas[i].numeroDaParcela);
+            printf("\nValor: %.2f", vetorParcelas[i].valorDaParcela);
+            printf("\nVencimento: %02d/%02d/%04d",vetorParcelas[i].dataVencimento.dia, vetorParcelas[i].dataVencimento.mes,vetorParcelas[i].dataVencimento.ano);
+            printf("\nSituacao: %c\n", vetorParcelas[i].situacaoDaParcela);
+        }
+    }
+}
+    
+    
+    
+    
