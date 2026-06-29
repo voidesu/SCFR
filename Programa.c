@@ -47,6 +47,7 @@ typedef struct Parcela {
     char situacaoDaParcela;
 } Parcela;
 
+// VARIAVEIS GLOBAIS
 // -------------------------------- VARIAVEIS GLOBAIS --------------------------------    
     
 Cliente cliente[20];
@@ -85,6 +86,15 @@ void buscarVendaID ();
 
 // Funções de Registro de Venda e Parcelas
 void registroVenda(); // feito
+void consultarVendas(); 
+int CalcularParcela();
+void exibirParcela(Parcela p);
+void gerarParcelas(Vendas v); //feito
+void exibirVenda(Vendas v);
+void exibirParcelasVenda(int idVenda);
+    
+ 
+// O MAIN TA AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
 void consultarVendas(); //feito
 int CalcularParcela();
 void gerarParcelas(Vendas v); //feito
@@ -746,6 +756,21 @@ void consultarVendas() {
         
         default:
         printf("OPCAO INVALIDA!!\n");
+        
+        case 2:
+        buscarVendaNome ();
+        break;
+        
+        case 3:
+        buscarVendaCPF ();
+        break;
+        
+        case 4:
+        buscarVendaTelefone();
+        break;
+        
+        default:
+        printf("OPCAO INVALIDA!!\n");
     }
 }
 
@@ -904,3 +929,60 @@ void liquidarDivida () {
     
     
 }
+
+void exibirVenda(Vendas v){
+
+    printf("\n==============================");
+    printf("\nID da venda: %d", v.idVenda);
+    printf("\nCliente: %s", v.cliente.nome);
+    printf("\nCPF: %s", v.cliente.CPF);
+    printf("\nValor: R$ %.2f", v.valorTotalVenda);
+    printf("\nForma de pagamento: ");
+    switch (v.formaPagamento) {
+    case 1:
+        printf("Dinheiro");
+        break;
+
+    case 2:
+        printf("Pix");
+        break;
+
+    case 3:
+        printf("Cartao a Vista");
+        break;
+
+    case 4:
+        printf("Cartao Parcelado");
+        break;
+}
+    printf("\nParcelas: %d", v.qtdeParcelas);
+    printf("\nData: %02d/%02d/%04d", v.dataVenda.dia, v.dataVenda.mes, v.dataVenda.ano);
+    printf("\nObservacao: %s\n", v.observacao);
+    
+    if (v.formaPagamento == 4) {
+    exibirParcelasVenda(v.idVenda);
+}
+}
+
+void exibirParcelasVenda(int idVenda){
+    int i;
+    
+    printf("\n==============================");
+    printf("\n         Parcelas\n");
+    printf("\n------------------------------");
+    
+    for(i=0;i<qtdParcelas;i++){
+        
+        if(vetorParcelas[i].idVenda == idVenda){
+
+            printf("\nParcela %d", vetorParcelas[i].numeroDaParcela);
+            printf("\nValor: %.2f", vetorParcelas[i].valorDaParcela);
+            printf("\nVencimento: %02d/%02d/%04d",vetorParcelas[i].dataVencimento.dia, vetorParcelas[i].dataVencimento.mes,vetorParcelas[i].dataVencimento.ano);
+            printf("\nSituacao: %c\n", vetorParcelas[i].situacaoDaParcela);
+        }
+    }
+}
+    
+    
+    
+    
