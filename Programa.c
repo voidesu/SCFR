@@ -10,7 +10,7 @@ Data de Início: 15/06/2026
 #include <stdlib.h>
 #include <math.h> 
 
-// STRUCTS
+// -------------------------------- STRUCTS --------------------------------    
 
 typedef struct Data {
     int dia;
@@ -48,6 +48,7 @@ typedef struct Parcela {
 } Parcela;
 
 // VARIAVEIS GLOBAIS
+// -------------------------------- VARIAVEIS GLOBAIS --------------------------------    
     
 Cliente cliente[20];
 int qtdClientes = 0;
@@ -58,7 +59,7 @@ int qtdVendas = 0;
 Parcela vetorParcelas[1000];
 int qtdParcelas = 0;
     
-// PROTOTIPO DAS FUNCOES     
+// -------------------------------- PROTOTIPO DAS FUNCOES --------------------------------    
     
 // Funções de Validação do Cadastro de Clientes
 int validarData ( Data dt );
@@ -94,6 +95,17 @@ void exibirParcelasVenda(int idVenda);
     
  
 // O MAIN TA AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+void consultarVendas(); //feito
+int CalcularParcela();
+void gerarParcelas(Vendas v); //feito
+void exibirVenda(Vendas v); // feito
+void exibirParcelasVenda(int idVenda); //feito
+void identificarParcelasVencidas (); // feito
+void quitarParcela (); // feito
+void liquidarDivida (); // feitoo
+ 
+// -------------------------------- AQUI O MAIN --------------------------------    
+
 int main(){
     int menu = 0;
 
@@ -148,12 +160,13 @@ int main(){
         
         switch(menu) {
             case 1:
-                if (qtdClientes < 50) {
+                if (qtdClientes < 20) {
 					cadastrarCliente();
                 } else {
                     printf("\nLimite de clientes atingido!\n");
                 }
                 break;
+                
             case 2:
             	registroVenda();
                 break;
@@ -179,6 +192,7 @@ int main(){
     return 0;
 }
 
+// -------------------------------- FUNÇÕES --------------------------------    
 
 //FUNÇÕES DE VALIDAÇÃO
 int validarData ( Data dt ){
@@ -742,7 +756,178 @@ void consultarVendas() {
         
         default:
         printf("OPCAO INVALIDA!!\n");
+        
+        case 2:
+        buscarVendaNome ();
+        break;
+        
+        case 3:
+        buscarVendaCPF ();
+        break;
+        
+        case 4:
+        buscarVendaTelefone();
+        break;
+        
+        default:
+        printf("OPCAO INVALIDA!!\n");
     }
+}
+
+void exibirVenda(Vendas v){
+
+    printf("\n==============================");
+    printf("\nID da venda: %d", v.idVenda);
+    printf("\nCliente: %s", v.cliente.nome);
+    printf("\nCPF: %s", v.cliente.CPF);
+    printf("\nValor: R$ %.2f", v.valorTotalVenda);
+    printf("\nForma de pagamento: ");
+    switch (v.formaPagamento) {
+    case 1:
+        printf("Dinheiro");
+        break;
+
+    case 2:
+        printf("Pix");
+        break;
+
+    case 3:
+        printf("Cartao a Vista");
+        break;
+
+    case 4:
+        printf("Cartao Parcelado");
+        break;
+}
+    printf("\nParcelas: %d", v.qtdeParcelas);
+    printf("\nData: %02d/%02d/%04d", v.dataVenda.dia, v.dataVenda.mes, v.dataVenda.ano);
+    printf("\nObservacao: %s\n", v.observacao);
+    
+    if (v.formaPagamento == 4) {
+    exibirParcelasVenda(v.idVenda);
+}
+}
+
+void exibirParcelasVenda(int idVenda){
+    int i;
+    
+    printf("\n==============================");
+    printf("\n         Parcelas\n");
+    printf("\n------------------------------");
+    
+    for(i=0;i<qtdParcelas;i++){
+        
+        if(vetorParcelas[i].idVenda == idVenda){
+
+            printf("\nParcela %d", vetorParcelas[i].numeroDaParcela);
+            printf("\nValor: %.2f", vetorParcelas[i].valorDaParcela);
+            printf("\nVencimento: %02d/%02d/%04d",vetorParcelas[i].dataVencimento.dia, vetorParcelas[i].dataVencimento.mes,vetorParcelas[i].dataVencimento.ano);
+            printf("\nSituacao: %c\n", vetorParcelas[i].situacaoDaParcela);
+        }
+    }
+}
+
+void identificarParcelasVencidas (){
+    int i;
+    Data hoje;
+    
+    printf("Digite a data de hoje (dd/mm/aaaa): ");
+    scanf("%d/%d/%d", &hoje.dia, &hoje.mes, &hoje.ano);
+    getchar();
+    
+    for(i=0; i < qtdParcelas; i++) {
+        
+        if(vetorParcelas[i].situacaoDaParcela == 'A') {
+            
+            if(vetorParcelas[i].dataVencimento.ano < hoje.ano) {
+                vetorParcelas[i].situacaoDaParcela = 'V';
+            }
+            
+            if(vetorParcelas[i].dataVencimento.ano == hoje.ano && 
+               vetorParcelas[i].dataVencimento.mes < hoje.mes) {
+                   vetorParcelas[i].situacaoDaParcela = 'V';
+            }
+            
+            if(vetorParcelas[i].dataVencimento.ano == hoje.ano && 
+               vetorParcelas[i].dataVencimento.mes == hoje.mes &&
+               vetorParcelas[i].dataVencimento.dia < hoje.dia) {
+                   vetorParcelas[i].situacaoDaParcela = 'V';
+            }
+         }
+    }
+    printf ("\n Parcelas vencidas atualizadas!!\n");
+}    
+
+void quitarParcela() {
+    int idVenda;
+    int i;
+    Data hoje;
+    
+    printf("\n==============================");
+    printf("\n       Quitar Parcela\n");
+    printf("\n------------------------------");
+    printf("\n Digite o ID da venda: ");
+    scanf("%d", &idVenda);
+    getchar();
+    
+    for (i = 0; i < qtdParcelas; i++ ){
+        
+        if (vetorParcelas[i].idVenda == idVenda && vetorParcelas[i].situacaoDaParcela == 'A') {
+            
+            printf("\nDa""ta do pagamento (dd/mm/aaaa): ");
+            scanf("%d/%d/%d", &hoje.dia, &hoje.mes, &hoje.ano);
+            getchar();
+            
+            vetorParcelas[i].dataRecebimento = hoje;
+            vetorParcelas[i].situacaoDaParcela = 'P';
+            
+            printf("\n Parcela %d paga com sucesso!! \n", vetorParcelas[i].numeroDaParcela);
+            
+            return;
+        }
+        
+    }
+    
+    printf("\nNenhuma parcela pendente encontrada\n");
+}
+
+void liquidarDivida () {
+    int idVenda;
+    int i = 0;
+    int quantidade = 0;
+    Data hoje;
+    
+    printf("\n==============================");
+    printf("\n       Liquidar Dividas\n");
+    printf("\n------------------------------");
+    printf("\nDigite o ID da venda: ");
+    scanf("%d", &idVenda);
+    getchar();
+    printf("\nData do pagamento (dd/mm/aaaa): ");
+    scanf("%d/%d/%d", &hoje.dia, &hoje.mes, &hoje.ano);
+    getchar();
+    
+    for (i = 0; i < qtdParcelas; i++) {
+        if(vetorParcelas[i].idVenda == idVenda && vetorParcelas[i].situacaoDaParcela == 'A') {
+            
+            vetorParcelas[i].dataRecebimento = hoje;
+            vetorParcelas[i].situacaoDaParcela = 'P';
+            
+            printf("\n Parcela %d quitada!!\n", vetorParcelas[i].numeroDaParcela);
+            
+            quantidade++;
+            
+            
+        }
+    }
+    
+    if (quantidade == 0) {
+        printf("\n Nenhuma Parcela pendente encontrada\n");
+    } else {
+        printf("\n Divida liquidada!! \n");
+    }
+    
+    
 }
 
 void exibirVenda(Vendas v){
